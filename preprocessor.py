@@ -14,8 +14,29 @@ def preprocess(data):
 
     
     df=pd.DataFrame({'user_message':messages,'message_date':cleaned_dates})
-    df['message_date']=pd.to_datetime(df['message_date'],dayfirst=True,errors='coerce')
-    df=df.dropna(subset=['message_date'])
+    
+    # Parse dates explicitly handling AM/PM and variable year format
+    def parse_whatsapp_date(date_str):
+        try:
+            # Handle formats: "17/02/24, 1:42 am" or "17/02/2024, 14:30"
+            if ',' not in date_str:
+                return pd.NaT
+            date_part, time_part = date_str.split(',', 1)
+            time_part = time_part.strip()
+            
+            # Check for am/pm
+            has_period = any(p in time_part.lower() for p in ['am', 'pm'])
+            if has_period:
+                fmt = '%d/%m/%y, %I:%M %p'
+            else:
+                fmt = '%d/%m/%y, %H:%M' if len(date_part.split('/')[2]) == 2 else '%d/%m/%Y, %H:%M'
+            
+            return pd.to_datetime(date_str, format=fmt, errors='coerce')
+        except:
+            return pd.NaT
+    
+    df['message_date'] = df['message_date'].apply(parse_whatsapp_date)
+    df = df.dropna(subset=['message_date'])
     df.rename(columns={'message_date':'date'},inplace=True)#inplace=true ni likhogi toh change ni krega
     users=[]
     messages=[]
