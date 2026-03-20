@@ -1,7 +1,7 @@
-streamlit
-pandas
-matplotlib
-seaborn
-wordcloud
-emoji
-urlextract
+streamlit==1.41.1
+pandas==2.2.3
+matplotlib==3.9.2
+seaborn==0.13.2
+wordcloud==1.9.3
+emoji==2.14.0
+urlextract==1.9.0
