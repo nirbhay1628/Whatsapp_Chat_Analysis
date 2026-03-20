@@ -11,10 +11,6 @@ It helps you analyze:
 - Wordcloud and most common words
 - Emoji usage distribution
 
-## Live Demo
-
-If deployed on Streamlit Cloud, open your app URL here:
-- https://whatsapp-chat-analysis-011.streamlit.app/
 
 ## Features
 
