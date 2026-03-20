@@ -14,7 +14,7 @@ It helps you analyze:
 ## Live Demo
 
 If deployed on Streamlit Cloud, open your app URL here:
-- https://github.com/nirbhay1628/Whatsapp_Chat_Analysis
+- https://whatsapp-chat-analysis-011.streamlit.app/
 
 ## Features
 
