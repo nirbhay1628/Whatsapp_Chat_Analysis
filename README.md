@@ -167,11 +167,3 @@ Contributions are welcome.
 2. Create a feature branch
 3. Commit your changes
 4. Open a pull request
-
-## License
-
-Add your preferred license (MIT recommended) in a LICENSE file.
-
-## Author
-
-Nirbhay
