@@ -2,15 +2,20 @@
 import re
 import pandas as pd
 def preprocess(data):
-    pattern=r'\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s'#r isliye use kr rhe use raw string bnane ke liye vrna python \d and \w as escape sequences in strings
-    messages=re.split(pattern,data)[1:]#pehli line bhi aa rhi thi isliye use hatane ke liye ye [1:] lagaya hta ke dekh lo
-    dates=re.findall(pattern,data)
-    print("Messages Length:", len(messages))
-    print("Dates Length:", len(dates))
+    # Normalize hidden unicode spaces from WhatsApp exports.
+    data = data.replace('\u202f', ' ').replace('\u200e', '').replace('\ufeff', '')
+
+    # Supports formats like: 17/02/24, 1:42 am - Name: Message
+    pattern = r'^\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}(?:\s?[apAP][mM])?\s-\s'
+    messages = re.split(pattern, data, flags=re.MULTILINE)[1:]
+    dates = re.findall(pattern, data, flags=re.MULTILINE)
+
+    cleaned_dates = [re.sub(r'\s-\s$', '', date).strip() for date in dates]
 
     
-    df=pd.DataFrame({'user_message':messages,'message_date':dates})
-    df['message_date']=pd.to_datetime(df['message_date'],format='%d/%m/%Y, %H:%M - ')
+    df=pd.DataFrame({'user_message':messages,'message_date':cleaned_dates})
+    df['message_date']=pd.to_datetime(df['message_date'],dayfirst=True,errors='coerce')
+    df=df.dropna(subset=['message_date'])
     df.rename(columns={'message_date':'date'},inplace=True)#inplace=true ni likhogi toh change ni krega
     users=[]
     messages=[]

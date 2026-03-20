@@ -14,11 +14,16 @@ if uploaded_file is not None:
     #st.text(data)  #to print this text data
     df=preprocessor.preprocess(data)#preprocessor ek library bnYI JHA preprocess func present h vha se call kr liya
 
+    #Debug: Show first few rows and data shape
+    st.write(f"**Data loaded:** {len(df)} messages found")
+    if len(df) == 0:
+        st.error("No messages were parsed from the file. Please make sure your WhatsApp chat is in the correct format: DD/MM/YYYY, HH:MM - Name: Message")
     #st.dataframe(df)#function to distplay dataframe
 
      #fetch unique users
     user_list=df['user'].unique().tolist()
-    user_list.remove('group_notification')#group notification hta rhe
+    if 'group_notification' in user_list:
+        user_list.remove('group_notification')#group notification hta rhe
     user_list.sort()#list sort kr rhe
     user_list.insert(0,"overall")#0th pos pe overall add kr rhe
     selected_user=st.sidebar.selectbox("show analysis wrt",user_list)#.selectbox(label, options): Creates a dropdown menu (select box)
@@ -34,7 +39,7 @@ if uploaded_file is not None:
         
         with col1:#Ensures the content inside is placed in the first column.
             st.header("total messages")#Displays a header text in first col
-            st.title(num_messages)*
+            st.title(num_messages)
         with col2:
             st.header("total words")
             st.title(num_words)
@@ -83,9 +88,12 @@ if uploaded_file is not None:
 
         st.title("weekly activity map")
         user_heatmap=helper.activity_heatmap(selected_user,df)
-        fig,ax=plt.subplots()
-        ax=sns.heatmap(user_heatmap)
-        st.pyplot(fig)
+        if not user_heatmap.empty and user_heatmap.shape[0] > 0 and user_heatmap.shape[1] > 0:
+            fig,ax=plt.subplots()
+            ax=sns.heatmap(user_heatmap)
+            st.pyplot(fig)
+        else:
+            st.write("No activity data available for heatmap")
 
         #finding the busiest users in the group(group level)
         if selected_user=="overall":
@@ -104,30 +112,39 @@ if uploaded_file is not None:
         #worldcloud
         st.title("wordcloud")
         df_wc=helper.create_wordcloud(selected_user,df)
-        fig,ax=plt.subplots()
-        ax.imshow(df_wc)#imshow is for image display
-        st.pyplot(fig)
+        if df_wc is not None:
+            fig,ax=plt.subplots()
+            ax.imshow(df_wc)#imshow is for image display
+            st.pyplot(fig)
+        else:
+            st.write("Not enough words to generate wordcloud")
 
         #most common words
         st.title("most common words")
         most_common_df=helper.most_common_words(selected_user,df)
-        fig,ax=plt.subplots()
-        ax.barh(most_common_df[0],most_common_df[1])#0 or 1 isliye kyuki st.dataframe(most_common_df) ye krne pe unke col ke nam 0 aur 1 bn rhe
-        #barh means horizontal barchart
-        plt.xticks(rotation="vertical")
-        st.pyplot(fig)
+        if not most_common_df.empty:
+            fig,ax=plt.subplots()
+            ax.barh(most_common_df[0],most_common_df[1])#0 or 1 isliye kyuki st.dataframe(most_common_df) ye krne pe unke col ke nam 0 aur 1 bn rhe
+            #barh means horizontal barchart
+            plt.xticks(rotation="vertical")
+            st.pyplot(fig)
+        else:
+            st.write("No common words found")
 
 
         #emoji analysis
         st.title("emoji analysis")
         emoji_df=helper.emoji_helper(selected_user,df)
-        col1,col2=st.columns(2)
-        with col1:
-           st.dataframe(emoji_df)
-        with col2:
-            fig,ax=plt.subplots()
-            ax.pie(emoji_df[1],labels=emoji_df[0],autopct="%0.2f")#autopct shows how much % of each slice...% is a placeholder for a number.....0.2f specifies that the number should be formatted as a floating-point value with 2 decimal places.e.g 25% =25.00
-            st.pyplot(fig)
+        if not emoji_df.empty:
+            col1,col2=st.columns(2)
+            with col1:
+               st.dataframe(emoji_df)
+            with col2:
+                fig,ax=plt.subplots()
+                ax.pie(emoji_df[1],labels=emoji_df[0],autopct="%0.2f")#autopct shows how much % of each slice...% is a placeholder for a number.....0.2f specifies that the number should be formatted as a floating-point value with 2 decimal places.e.g 25% =25.00
+                st.pyplot(fig)
+        else:
+            st.write("No emojis found")
 
         #time based analysis
         

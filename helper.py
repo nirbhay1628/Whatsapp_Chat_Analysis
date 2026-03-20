@@ -62,7 +62,11 @@ def create_wordcloud(selected_user,df):
     wc=WordCloud(width=500,height=500,min_font_size=10,background_color='white')#WordCloud class ka ek object wc banaya gaya hai.
     #width=500, height=500 → WordCloud ki image ka size.
     temp['message']=temp['message'].apply(remove_stop_words)#This applies the remove_stop_words function to every value in the 'message' column of the DataFrame temp.
-    df_wc=wc.generate(temp['message'].str.cat(sep=" "))# multiple strings hain, to .str.cat(sep=" ") unko ek saath concatenate (join) kar dega.
+    text=temp['message'].astype(str).str.cat(sep=" ")
+    if text.strip():
+        df_wc=wc.generate(text)
+    else:
+        return None
     #wc.generate(...) → Is single string se WordCloud generate ho raha hai.
     return df_wc
 def most_common_words(selected_user,df):
@@ -80,7 +84,10 @@ def most_common_words(selected_user,df):
         for word in message.lower().split():
             if word not in stop_words:
                 words.append(word)
-    most_common_df=pd.DataFrame(Counter(words).most_common(20))
+    if words:
+        most_common_df=pd.DataFrame(Counter(words).most_common(20))
+    else:
+        most_common_df=pd.DataFrame()
     return most_common_df
 def emoji_helper(selected_user,df):
     if selected_user!='overall':
