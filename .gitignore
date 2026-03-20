@@ -1,1 +1,18 @@
-c:\Users\shwet\OneDrive\Desktop\ml\ktkr_10\venv
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Notebook and tooling artifacts
+.ipynb_checkpoints/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Local chat exports (user data)
+WhatsApp Chat*.txt
